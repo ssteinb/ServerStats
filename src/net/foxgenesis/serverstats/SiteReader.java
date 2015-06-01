@@ -37,7 +37,7 @@ public final class SiteReader {
 		URLConnection connection = url.openConnection();
 		connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.29 Safari/537.36"); 
 		BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-		ArrayList<String> output = new ArrayList<>();
+		ArrayList<String> output = new ArrayList<String>();
 		String inputLine;
 		while((inputLine = in.readLine()) != null) 
 			output.add(inputLine);
