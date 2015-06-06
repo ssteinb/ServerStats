@@ -1,0 +1,12 @@
+settings:
+  pmc:
+    #Enter in a valid PMC server post (i.e. http://www.planetminecraft.com/server/-hunger-games-free-to-play-no-whitelist-heaps-of-players)
+    url: 
+    #Choose what to display when stats are requested. Tags (i.e. %title%) will be replaced before output. 
+    #Valid tags include: title, author, views, views_today, upvotes, favorites, server_votes, comments, server_score, stats_updated, url and author_url
+    #Use ; for a new line
+    display: We have %views_today% today!;This a new line!
+    enable: false
+  cache:
+    #Set time (in milliseconds) of when cache should expire
+    expiration-time: 60000
