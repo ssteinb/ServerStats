@@ -8,7 +8,7 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 
 public final class SiteReader {
-
+	
 	/**
 	 * Get a site's HTML
 	 * @param url - site's url
@@ -16,9 +16,7 @@ public final class SiteReader {
 	 * @throws IOException
 	 */
 	public static String getHTML(URL url) throws IOException {
-		URLConnection connection = url.openConnection();
-		connection.setRequestProperty("User-Agent", "Mozilla/5.0"); 
-		BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+		BufferedReader in = getStream(url);
 		String output = "";
 		String inputLine;
 		while((inputLine = in.readLine()) != null) 
@@ -26,7 +24,7 @@ public final class SiteReader {
 		in.close();
 		return output;
 	}
-	
+
 	/**
 	 * Get a sites HTML and store it by line
 	 * @param url - site url
@@ -34,14 +32,19 @@ public final class SiteReader {
 	 * @throws IOException
 	 */
 	public static String[] getHTMLLines(URL url) throws IOException {
-		URLConnection connection = url.openConnection();
-		connection.setRequestProperty("User-Agent", "Mozilla/5.0"); 
-		BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+		BufferedReader in = getStream(url);
 		ArrayList<String> output = new ArrayList<String>();
 		String inputLine;
 		while((inputLine = in.readLine()) != null) 
 			output.add(inputLine);
 		in.close();
 		return output.toArray(new String[]{});
+	}
+	
+	private static BufferedReader getStream(URL url) throws IOException {
+		URLConnection connection = url.openConnection();
+		connection.setRequestProperty("User-Agent", "X-ServerStats");
+		connection.setReadTimeout(3000);
+		return new BufferedReader(new InputStreamReader(connection.getInputStream()));
 	}
 }

@@ -1,10 +1,10 @@
 package net.foxgenesis.serverstats;
 
-import static net.foxgenesis.serverstats.Logger.log;
 import static net.foxgenesis.serverstats.Logger.error;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -18,43 +18,23 @@ public abstract class WebsiteStats {
 	private JSONObject json;
 	private boolean enabled;
 	private String[] display;
+	private final HashMap<String, String> tags = new HashMap<String, String>();
+	private final String name;
 
-	public WebsiteStats(String url) {
+	public WebsiteStats(String url, String shorthandName, String[] keys, String[] values) {
+		this.name = shorthandName;
+		for(int i=0; i<keys.length; i++)
+			tags.put(keys[i], values[i]);
 		try {
 			this.url = new URL(url);
-			update(this.url);
-		} catch (MalformedURLException e) {error(ErrorCodes.error(ErrorCodes.WEB_REQUEST));}
+		} catch (MalformedURLException e) {error(ErrorCodes.error(ErrorCodes.URL_INVALID));}
 	}
 
-	/**
-	 * Get if the stats should be enabled
-	 * @return stats enabled
-	 */
-	public boolean isEnabled() {
-		return enabled;
-	}
-
-	/**
-	 * Check if the data object is null
-	 * @return if data object is not null
-	 */
-	protected boolean hasData() {
-		return hasURL() && json != null;
-	}
-
-	/**
-	 * Check if the stats contains a valid url
-	 * @return url is valid
-	 */
-	public boolean hasURL() {
-		return url != null;
-	}
-
-	protected String get(String key) {
+	private String get(String key) {
 		JSONObject j = getJSON();
 		if(j!=null)
 			return j.getString(key);
-		return null;
+		return "NULL";
 	}
 
 	private JSONObject getJSON() {
@@ -62,13 +42,19 @@ public abstract class WebsiteStats {
 			json = update(url);
 			lastUpdate = System.currentTimeMillis();
 		}
-		else
-			log("using old data");
 		return json;
 	}
 
 	private boolean getNewStats() {
 		return lastUpdate == -1 || (System.currentTimeMillis() - lastUpdate) >= updateTime;
+	}
+	
+	/**
+	 * Get the name of the stats
+	 * @return stats name
+	 */
+	public final String getName() {
+		return name;
 	}
 
 	/**
@@ -77,8 +63,8 @@ public abstract class WebsiteStats {
 	 */
 	public void loadSettings(FileConfiguration config) {
 		updateTime = config.getLong("settings.cache.expiration-time");
-		enabled = config.getBoolean("settings." + getShorthandName() + ".enable");
-		display = config.getString("settings." + getShorthandName() + ".display").split(";");
+		enabled = config.getBoolean("settings." + name + ".enable");
+		display = config.getString("settings." + name + ".display").split(";");
 	}
 
 	public void display(CommandSender sender) {
@@ -92,7 +78,7 @@ public abstract class WebsiteStats {
 			}
 		}
 		else
-			sender.sendMessage(ChatColor.RED + getShorthandName() + " is not enabled");
+			sender.sendMessage(ChatColor.RED + name + " is not enabled");
 	}
 
 	protected String[] format(String[] lines) {
@@ -114,6 +100,14 @@ public abstract class WebsiteStats {
 		String back = line.substring(end, line.length());
 		return front + value + back;
 	}
+	
+	private String getStat(String tag) {
+		tag = tag.toLowerCase();
+		if(tags.containsKey(tag))
+			return get(tags.get(tag));
+		else
+			return "Unsupported Tag";
+	}
 
 	/**
 	 * Get the new statistics and return them as a JSONObject
@@ -121,6 +115,4 @@ public abstract class WebsiteStats {
 	 * @return JSONObject representation of the stats
 	 */
 	protected abstract JSONObject update(URL url);
-	protected abstract String getShorthandName();
-	protected abstract String getStat(String key);
 }

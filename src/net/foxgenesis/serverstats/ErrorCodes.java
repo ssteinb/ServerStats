@@ -5,5 +5,5 @@ public final class ErrorCodes {
 		return "An error has occured. Please contact your administrator. Ref = " + error;
 	}
 	public static final int FORMAT = 0x00;
-	public static final int WEB_REQUEST = 0x01;
+	public static final int URL_INVALID = 0x01;
 }

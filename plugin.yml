@@ -1,8 +1,7 @@
 name: ServerStats
 main: net.foxgenesis.serverstats.ServerStats
 version: 1.0
- 
+
 commands:
-    serverstats:
-        description: Displays the requested statistics
-        usage: /<command> [pmc | all]
+  serverstats:
+    usage: /serverstats [pmc]

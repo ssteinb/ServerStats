@@ -1,5 +1,7 @@
 package net.foxgenesis.serverstats;
 
+import static net.foxgenesis.serverstats.Logger.log;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -12,31 +14,35 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import static net.foxgenesis.serverstats.Logger.log;
+
 import com.google.common.io.ByteStreams;
 
 public class ServerStats extends JavaPlugin {
 
 	private PMCStats pmc;
-
+	
 	@Override
 	public void onEnable() {
-		log("Loading config...");
 		try {
+			log("Loading config...");
 			getConfig().load(loadResource(this,"config.yml"));
 		} catch (IOException | InvalidConfigurationException e) {
 			e.printStackTrace();
+			log("Unloading...");
+			this.getPluginLoader().disablePlugin(this);
+			return;
 		}
-		log("Done!");
+		
 		log("Creating PMC Stats loader...");
 		pmc = new PMCStats(getConfig().getString("settings.pmc.url"));
 		pmc.loadSettings(getConfig());
-		log("Done!");
-		log("Finished!");
+		log("Enabled!");
 	}
 
 	@Override
-	public void onDisable() {}
+	public void onDisable() {
+		pmc = null;
+	}
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -49,10 +55,11 @@ public class ServerStats extends JavaPlugin {
 				sender.sendMessage(ChatColor.GOLD + "/serverstats minecraft-mp");
 				sender.sendMessage(ChatColor.GOLD + "/serverstats all");
 				return true;
-			} else if (args[0].equalsIgnoreCase("pmc")) {
-				pmc.display(sender);
-				return true;
-			}
+			} else 
+				switch(args[0].toLowerCase()) {
+				default: return false;
+				case "pmc": pmc.display(sender); return true;
+				}
 		}
 		return false;
 	}

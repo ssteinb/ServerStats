@@ -9,14 +9,17 @@ import org.json.JSONObject;
  * PMCStats takes in a PMC server post and retrieves the statistics
  * @author Seth
  */
-public class PMCStats extends WebsiteStats{
+public class PMCStats extends WebsiteStats {
+	private static final String[] keys = {"title", "views", "author", "diamonds", "favorites", "views_today", 
+		"server_votes", "comments", "server_score", "stats_updated", "url", "author_url"},
+			values = {"title", "views", "author", "upvotes", "favorites", "v_today", "server_votes", "comments", "server_score", "stats_updated", "url", "author_url"};
 	/**
 	 * Create a new PMCStats with given server url 
 	 * @param s - server url (i.e. http://www.planetminecraft.com/server/-hunger-games-free-to-play-no-whitelist-heaps-of-players/)
 	 * @throws MalformedURLException
 	 */
-	public PMCStats(String s) {
-		super(s + "/stats/");
+	public PMCStats(String url) {
+		super(url + "/stats/", "pmc", keys, values);
 	}
 
 	@Override
@@ -25,44 +28,6 @@ public class PMCStats extends WebsiteStats{
 			return new JSONObject(SiteReader.getHTML(url));
 		} catch (IOException e) {error(e.getMessage().replace("/stats/", ""));}
 		return null;
-	}
-
-
-	@Override
-	protected String getShorthandName() {
-		return "pmc";
-	}
-
-	@Override
-	protected String getStat(String key) {
-		switch(key.toLowerCase()) {
-		default:break;
-		case "title":
-			return get("title");
-		case "views":
-			return get("views");
-		case "author":
-			return get("author");
-		case "upvotes":
-			return get("upvotes");
-		case "favorites":
-			return get("favorites");
-		case "views_today":
-			return get("v_today");
-		case "server_votes":
-			return get("server_votes");
-		case "comments":
-			return get("comments");
-		case "server_score":
-			return get("server_score");
-		case "stats_updated":
-			return get("stats_updated");
-		case "url":
-			return get("url");
-		case "author_url":
-			return get("author_url");
-		}
-		return "Unsupported Tag";
 	}
 	
 	public static void main(String[] args) {
