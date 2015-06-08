@@ -10,10 +10,3 @@ settings:
   cache:
     #Set time (in milliseconds) of when cache should expire
     expiration-time: 60000
-  #command alias
-  alias:
-    - ss
-    - stats
-    - stat
-  #command name
-  command: serverstats
