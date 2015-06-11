@@ -44,7 +44,7 @@ public final class SiteReader {
 	private static BufferedReader getStream(URL url) throws IOException {
 		URLConnection connection = url.openConnection();
 		connection.setRequestProperty("User-Agent", "X-ServerStats");
-		connection.setReadTimeout(3000);
+		connection.setReadTimeout(5000);
 		return new BufferedReader(new InputStreamReader(connection.getInputStream()));
 	}
 }

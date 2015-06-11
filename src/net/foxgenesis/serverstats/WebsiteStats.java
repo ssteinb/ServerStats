@@ -1,7 +1,7 @@
 package net.foxgenesis.serverstats;
 
 import static net.foxgenesis.serverstats.Logger.error;
-
+import static net.foxgenesis.serverstats.Logger.log;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -21,13 +21,12 @@ public abstract class WebsiteStats {
 	private final HashMap<String, String> tags = new HashMap<String, String>();
 	private final String name;
 
-	public WebsiteStats(String url, String shorthandName, String[] keys, String[] values) {
-		this.name = shorthandName;
-		for(int i=0; i<keys.length; i++)
-			tags.put(keys[i], values[i]);
-		try {
-			this.url = new URL(url);
-		} catch (MalformedURLException e) {error(ErrorCodes.error(ErrorCodes.URL_INVALID));}
+	public WebsiteStats(String shorthandName) {
+		name = shorthandName;
+		String[][] j = registerKeys();
+		log("Creating tags for " + shorthandName);
+		for(int i=0; i<j[0].length; i++)
+			tags.put(j[0][i], j[1][i]);
 	}
 
 	private String get(String key) {
@@ -65,6 +64,9 @@ public abstract class WebsiteStats {
 		updateTime = config.getLong("settings.cache.expiration-time");
 		enabled = config.getBoolean("settings." + name + ".enable");
 		display = config.getString("settings." + name + ".display").split(";");
+		try {
+			url = new URL(config.getString("settings." + name + ".url"));
+		} catch (MalformedURLException e) {error(ErrorCodes.error(ErrorCodes.URL_INVALID));}
 	}
 
 	public void display(CommandSender sender) {
@@ -115,4 +117,5 @@ public abstract class WebsiteStats {
 	 * @return JSONObject representation of the stats
 	 */
 	protected abstract JSONObject update(URL url);
+	protected abstract String[][] registerKeys();
 }
