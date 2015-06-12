@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import net.foxgenesis.helper.ArrayHelper;
 
 import org.bukkit.ChatColor;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -33,10 +32,12 @@ import com.google.common.io.ByteStreams;
 public class ServerStats extends JavaPlugin {
 
 	private WebsiteStats[] stats;
-	private ArrayList<Player> players = new ArrayList<>();
+	private ArrayList<Player> players;
 	protected static ServerStats instance;
 	@Override
 	public void onEnable() {
+		Logger.init(getLogger());
+		players = new ArrayList<>();
 		instance = this;
 		try {
 			log("Loading config...");
@@ -52,60 +53,71 @@ public class ServerStats extends JavaPlugin {
 			log("Creating stats configuration for " + a.getName() + "...");
 			a.loadSettings(getConfig());
 		}
+		log("Loading sign data...");
+		SignData.file = new File(getDataFolder().toString() + "/.signdata");
+		SignData.init(getConfig().getBoolean("settings.signs.allow-marquee"));
 		log("Creating sign listener...");
 		getServer().getPluginManager().registerEvents(new Listener() {
 			@EventHandler
 			public void onPlayerClickSign(PlayerInteractEvent event){
 				Player player = event.getPlayer();
-				if(players.contains(player) && event.getClickedBlock().getType() == Material.SIGN || 
-						event.getClickedBlock().getType() == Material.SIGN_POST ||event.getClickedBlock().getType() == Material.WALL_SIGN){
+				if(players.contains(player) && (event.getClickedBlock().getType() == Material.SIGN || 
+						event.getClickedBlock().getType() == Material.SIGN_POST ||event.getClickedBlock().getType() == Material.WALL_SIGN)){
 					if(event.getAction() == Action.RIGHT_CLICK_BLOCK){
 						Sign sign = (Sign) event.getClickedBlock().getState();
 						if(!SignData.locs.contains(sign.getLocation())) {
 							log("Adding sign for: " + sign.getLocation());
+							player.sendMessage(ChatColor.GOLD + "Adding sign for " + sign.getLocation());
 							SignData.add(sign.getLocation(),sign.getLines());
+							SignData.save();
 						}
+						else
+							player.sendMessage(ChatColor.RED + "Sign already added!");
 					}
 				}
 			}
 		}, this);
-		log("Loading sign data...");
-		SignData.file = new File(getDataFolder().toString() + "/signs.sd");
-		SignData.init();
 		log("Enabled!");
 		getServer().getScheduler().runTaskTimer(this, new Runnable() {
 
 			@Override
 			public void run() {
-				Location[] remove = {};
+				SignData[] remove = {};
 				for(int j=0; j<SignData.locs.size(); j++) {
-					Location a = SignData.locs.get(j);
-					World w = a.getWorld();
-					Block b = w.getBlockAt(a);
+					SignData a = SignData.locs.get(j);
+					a.update();
+					World w = a.getLocation().getWorld();
+					Block b = w.getBlockAt(a.getLocation());
 					if(b.getType() == Material.SIGN || b.getType() == Material.SIGN_POST || b.getType() == Material.WALL_SIGN) {
 						Sign s = (Sign)b.getState();
+						String[] g = a.getLines();
 						for(WebsiteStats d: stats)
-							for(int i=0; i<s.getLines().length; i++)
-								s.setLine(i,d.format(SignData.lines.get(a)[i]));
+							for(int i=0; i<g.length; i++)
+								g[i] = d.format(a.getLines()[i]);
+						g = a.callback(g);
+						for(int i=0; i<g.length; i++)
+							s.setLine(i, g[i]);
 						s.update(true);
 					}
 					else
 						remove = ArrayHelper.append(remove,a);
 				}
-				for(Location a:remove) {
+				for(SignData a:remove) {
 					log("removing location = " + a);
 					SignData.locs.remove(a);
 				}
-				SignData.save();
 			}
-
-		}, getConfig().getLong("settings.cache.expiration-time")/20, getConfig().getLong("settings.cache.expiration-time")/20);
+		}, getConfig().getLong("settings.signs.update-time"), getConfig().getLong("settings.signs.update-time"));
 	}
 
 	@Override
 	public void onDisable() {
+		log("removing task...");
+		getServer().getScheduler().cancelTasks(this);
+		log("removing access data...");
 		stats = null;
 		instance = null;
+		players = null;
 	}
 
 	@Override

@@ -10,3 +10,8 @@ settings:
   cache:
     #Set time (in milliseconds) of when cache should expire
     expiration-time: 60000
+  signs:
+    #Set if marquees should be allowed
+    allow-marquee: true
+    #amount of ticks before signs are to update
+    update-time: 60
