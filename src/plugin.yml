@@ -1,7 +1,8 @@
 name: ServerStats
 main: net.foxgenesis.serverstats.ServerStats
 version: 1.0
+author: fox_news
 
 commands:
   serverstats:
-    usage: /serverstats [pmc]
+    usage: /serverstats

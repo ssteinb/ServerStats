@@ -1,0 +1,37 @@
+#onDisable
+sign-data-save: Saving sign data...
+removing-task: Removing task...
+removing-access-data: Removing access data...
+
+#onEnable
+load-config: Loading config...
+web-stat-create: Creating stats for %name%...
+sign-data-load: Loading sign data...
+sign-listener-create: Creating sign listener...
+web-stats-create-tags: Creating tags for %name%...
+
+#Errors
+error: An error has occurred. Please contact your administrator. Ref=
+invalid-tag: Unsupported Tag
+
+#Commands
+command-header: ------[ ServerStats Help ]------
+server-stats-listen: listen
+server-stats-listen-add: Adding sign for %loc%
+server-stats-listen-noadd: Sign already added!
+server-stats-listen-toggle: Listen= 
+server-stats-update: update
+server-stats-forceupdate-notify: Updating...
+server-stats-forceupdate-complete: Updated!
+server-stats-enabled: %name% is not enabled
+
+#Signs
+signs-remove: removing 
+
+#Logic
+true: true
+false: false
+
+#Misc
+sign-update-time-notify: Average sign update time =
+sign-update-time-nanos: nano seconds
