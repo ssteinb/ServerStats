@@ -1,3 +1,20 @@
+/**
+    Copyright (C) 2015  FoxGenesis
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
 package net.foxgenesis.serverstats.signs;
 
 import static net.foxgenesis.serverstats.Logger.error;
@@ -29,22 +46,21 @@ public final class SignData {
 
 	/**
 	 * Add a Location
-	 * @param loc - Location to add
-	 * @param lines - Sign lines to add
+	 * 
+	 * @param loc
+	 *            - Location to add
+	 * @param lines
+	 *            - Sign lines to add
 	 */
 	protected static void add(Location loc, String[] lines) {
 		locs.add(new SignData(loc, lines));
 	}
 
-	private static String get(String line, String i, boolean s) {
-		int s0 = line.indexOf(i) + i.length();
-		int s1 = line.indexOf(s ? "}" : ",", s0 + 1);
-		return line.substring(s0, s1);
-	}
-
 	/**
 	 * Check to see if a Location is already used
-	 * @param loc - location to use
+	 * 
+	 * @param loc
+	 *            - location to use
 	 * @return if Location is in use
 	 */
 	protected static boolean contains(Location loc) {
@@ -54,9 +70,17 @@ public final class SignData {
 		return false;
 	}
 
+	private static String get(String line, String i, boolean s) {
+		int s0 = line.indexOf(i) + i.length();
+		int s1 = line.indexOf(s ? "}" : ",", s0 + 1);
+		return line.substring(s0, s1);
+	}
+
 	/**
 	 * Read and create all SignData
-	 * @param m - Should use marquees
+	 * 
+	 * @param m
+	 *            - Should use marquees
 	 * @locks SignData file
 	 */
 	public static void init(boolean m) {
@@ -95,10 +119,11 @@ public final class SignData {
 
 	/**
 	 * Save all SignData
+	 * 
 	 * @locks SignData file
 	 */
 	public static void save() {
-		if(file == null)
+		if (file == null)
 			return;
 		synchronized (file) {
 			if (locs.isEmpty())

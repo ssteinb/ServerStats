@@ -1,3 +1,20 @@
+/**
+    Copyright (C) 2015  FoxGenesis
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
 package net.foxgenesis.serverstats.signs;
 
 import static net.foxgenesis.serverstats.Logger.log;
@@ -30,11 +47,16 @@ public class SignListener implements Listener {
 			if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
 				final Sign sign = (Sign) event.getClickedBlock().getState();
 				if (!SignData.contains(sign.getLocation())) {
-					log(ExternalStrings.get("server-stats-listen-add").replace("%loc%",sign.getLocation().toString()));
-					player.sendMessage(ChatColor.GOLD + ExternalStrings.get("server-stats-listen-add").replace("%loc%",sign.getLocation().toString()));
+					log(ExternalStrings.get("server-stats-listen-add").replace(
+							"%loc%", sign.getLocation().toString()));
+					player.sendMessage(ChatColor.GOLD
+							+ ExternalStrings.get("server-stats-listen-add")
+									.replace("%loc%",
+											sign.getLocation().toString()));
 					SignData.add(sign.getLocation(), sign.getLines());
 				} else
-					player.sendMessage(ChatColor.RED + ExternalStrings.get("server-stats-listen-noadd"));
+					player.sendMessage(ChatColor.RED
+							+ ExternalStrings.get("server-stats-listen-noadd"));
 			}
 		}
 	}
