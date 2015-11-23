@@ -27,9 +27,8 @@ import net.foxgenesis.helper.SiteReader;
 import org.json.JSONObject;
 
 public class CustomJSON extends WebsiteStats {
-
 	public CustomJSON() {
-		super("custom", '~');
+		super("json", '~');
 	}
 
 	@Override
@@ -38,11 +37,10 @@ public class CustomJSON extends WebsiteStats {
 	}
 
 	@Override
-	protected JSONObject update(final URL url) {
+	protected JSONObject update(URL url) {
 		try {
-			final JSONObject j = new JSONObject(SiteReader.getHTML(url));
-			useNewTags(new String[][] { j.keySet().toArray(new String[] {}),
-					j.keySet().toArray(new String[] {}) });
+			JSONObject j = SiteReader.readJSON(url);
+			useNewKeys(j);
 			return j;
 		} catch (final IOException e) {
 			error(e.getMessage());

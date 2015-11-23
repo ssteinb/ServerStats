@@ -98,14 +98,12 @@ public class CDL {
 	 * @return A JSONArray of strings.
 	 * @throws JSONException
 	 */
-	public static JSONArray rowToJSONArray(final JSONTokener x)
-			throws JSONException {
+	public static JSONArray rowToJSONArray(final JSONTokener x) throws JSONException {
 		final JSONArray ja = new JSONArray();
 		for (;;) {
 			final String value = getValue(x);
 			char c = x.next();
-			if (value == null
-					|| (ja.length() == 0 && value.length() == 0 && c != ',')) {
+			if (value == null || (ja.length() == 0 && value.length() == 0 && c != ',')) {
 				return null;
 			}
 			ja.put(value);
@@ -117,8 +115,7 @@ public class CDL {
 					if (c == '\n' || c == '\r' || c == 0) {
 						return ja;
 					}
-					throw x.syntaxError("Bad character '" + c + "' (" + (int) c
-							+ ").");
+					throw x.syntaxError("Bad character '" + c + "' (" + (int) c + ").");
 				}
 				c = x.next();
 			}
@@ -138,8 +135,7 @@ public class CDL {
 	 * @return A JSONObject combining the names and values.
 	 * @throws JSONException
 	 */
-	public static JSONObject rowToJSONObject(final JSONArray names,
-			final JSONTokener x) throws JSONException {
+	public static JSONObject rowToJSONObject(final JSONArray names, final JSONTokener x) throws JSONException {
 		final JSONArray ja = rowToJSONArray(x);
 		return ja != null ? ja.toJSONObject(names) : null;
 	}
@@ -162,11 +158,8 @@ public class CDL {
 			final Object object = ja.opt(i);
 			if (object != null) {
 				final String string = object.toString();
-				if (string.length() > 0
-						&& (string.indexOf(',') >= 0
-								|| string.indexOf('\n') >= 0
-								|| string.indexOf('\r') >= 0
-								|| string.indexOf(0) >= 0 || string.charAt(0) == '"')) {
+				if (string.length() > 0 && (string.indexOf(',') >= 0 || string.indexOf('\n') >= 0
+						|| string.indexOf('\r') >= 0 || string.indexOf(0) >= 0 || string.charAt(0) == '"')) {
 					sb.append('"');
 					final int length = string.length();
 					for (int j = 0; j < length; j += 1) {
@@ -196,8 +189,7 @@ public class CDL {
 	 * @return A JSONArray of JSONObjects.
 	 * @throws JSONException
 	 */
-	public static JSONArray toJSONArray(final JSONArray names,
-			final JSONTokener x) throws JSONException {
+	public static JSONArray toJSONArray(final JSONArray names, final JSONTokener x) throws JSONException {
 		if (names == null || names.length() == 0) {
 			return null;
 		}
@@ -226,8 +218,7 @@ public class CDL {
 	 * @return A JSONArray of JSONObjects.
 	 * @throws JSONException
 	 */
-	public static JSONArray toJSONArray(final JSONArray names,
-			final String string) throws JSONException {
+	public static JSONArray toJSONArray(final JSONArray names, final String string) throws JSONException {
 		return toJSONArray(names, new JSONTokener(string));
 	}
 
@@ -240,8 +231,7 @@ public class CDL {
 	 * @return A JSONArray of JSONObjects.
 	 * @throws JSONException
 	 */
-	public static JSONArray toJSONArray(final JSONTokener x)
-			throws JSONException {
+	public static JSONArray toJSONArray(final JSONTokener x) throws JSONException {
 		return toJSONArray(rowToJSONArray(x), x);
 	}
 
@@ -254,8 +244,7 @@ public class CDL {
 	 * @return A JSONArray of JSONObjects.
 	 * @throws JSONException
 	 */
-	public static JSONArray toJSONArray(final String string)
-			throws JSONException {
+	public static JSONArray toJSONArray(final String string) throws JSONException {
 		return toJSONArray(new JSONTokener(string));
 	}
 
@@ -290,8 +279,7 @@ public class CDL {
 	 * @return A comma delimited text.
 	 * @throws JSONException
 	 */
-	public static String toString(final JSONArray names, final JSONArray ja)
-			throws JSONException {
+	public static String toString(final JSONArray names, final JSONArray ja) throws JSONException {
 		if (names == null || names.length() == 0) {
 			return null;
 		}

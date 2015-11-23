@@ -32,12 +32,10 @@ import org.json.JSONObject;
  * @author Seth
  */
 public class PMCStats extends WebsiteStats {
-	private static final String[] keys = { "title", "views", "author",
-			"diamonds", "favorites", "views_today", "server_votes", "comments",
-			"server_score", "stats_updated", "url", "author_url" }, values = {
-			"title", "views", "author", "upvotes", "favorites", "v_today",
-			"server_votes", "comments", "server_score", "stats_updated", "url",
-			"author_url" };
+	private static final String[] keys = { "title", "views", "author", "diamonds", "favorites", "views_today",
+			"server_votes", "comments", "server_score", "stats_updated", "url", "author_url" },
+			values = { "title", "views", "author", "upvotes", "favorites", "v_today", "server_votes", "comments",
+					"server_score", "stats_updated", "url", "author_url" };
 
 	/**
 	 * Create a new PMCStats with given server url
@@ -60,4 +58,6 @@ public class PMCStats extends WebsiteStats {
 		}
 		return null;
 	}
+	
+	public static void main(String[] args){}
 }

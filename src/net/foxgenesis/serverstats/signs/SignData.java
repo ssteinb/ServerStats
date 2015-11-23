@@ -20,28 +20,28 @@ package net.foxgenesis.serverstats.signs;
 import static net.foxgenesis.serverstats.Logger.error;
 import static net.foxgenesis.serverstats.Logger.log;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.bukkit.Location;
+
 import net.foxgenesis.helper.Marquee;
 import net.foxgenesis.serverstats.ServerStats;
-
-import org.bukkit.Location;
 
 public final class SignData {
 	/**
 	 * SignData file. Where all SignData is stored
 	 */
-	public static File file;
+	private static File file;
 	/**
 	 * List of all SignData
 	 */
-	public static final ArrayList<SignData> locs = new ArrayList<>();
+	protected static final ArrayList<SignData> locs = new ArrayList<>();
+	private static ServerStats plugin;
 	private static boolean marquee;
 
 	/**
@@ -64,10 +64,7 @@ public final class SignData {
 	 * @return if Location is in use
 	 */
 	protected static boolean contains(Location loc) {
-		for (SignData a : locs)
-			if (a.equals(loc))
-				return true;
-		return false;
+		return locs.stream().anyMatch(a -> a.equals(loc));
 	}
 
 	private static String get(String line, String i, boolean s) {
@@ -83,7 +80,9 @@ public final class SignData {
 	 *            - Should use marquees
 	 * @locks SignData file
 	 */
-	public static void init(boolean m) {
+	public static void init(ServerStats plugin, boolean m) {
+		SignData.plugin = plugin;
+		file = new File(plugin.getDataFolder().toString() + "/.signdata");
 		if (!file.exists())
 			try {
 				file.createNewFile();
@@ -93,26 +92,19 @@ public final class SignData {
 			}
 		marquee = m;
 		synchronized (file) {
-			try (BufferedReader r = new BufferedReader(new FileReader(file))) {
-				String line = "";
-				while ((line = r.readLine()) != null) {
+			try {
+				Files.readAllLines(file.toPath()).stream().filter(line -> line.startsWith("Location")).forEach(line -> {
+					SignData s = null;
 					try {
-						if (!line.startsWith("Location"))
-							continue;
-						SignData s = null;
-						try {
-							s = new SignData(line);
-						} catch (Exception e) {
-							log(line);
-						}
-						if (!locs.contains(s))
-							locs.add(s);
-					} catch (NullPointerException e) {
-						error(e.getMessage());
+						s = new SignData(line);
+					} catch (Exception e) {
+						log(line);
 					}
-				}
+					if (!locs.contains(s))
+						locs.add(s);
+				});
 			} catch (IOException e) {
-				e.printStackTrace();
+				error(e.getMessage());
 			}
 		}
 	}
@@ -146,27 +138,25 @@ public final class SignData {
 	private final String[] lines;
 	private final Marquee[] m;
 
-	SignData(final Location loc, final String[] lines) {
+	SignData(Location loc, String[] lines) {
 		this.loc = loc;
 		this.lines = lines;
 		m = new Marquee[lines.length];
 	}
 
-	SignData(final String line) {
+	SignData(String line) {
 		if (!line.startsWith("Location"))
 			throw new NullPointerException("Invalid sign data! [" + line + "]");
 		String worldName = get(line, "name=", true);
-		double x = Double.parseDouble(get(line, "x=", false)), y = Double
-				.parseDouble(get(line, "y=", false)), z = Double
-				.parseDouble(get(line, "z=", false));
-		loc = new Location(
-				ServerStats.instance.getServer().getWorld(worldName), x, y, z);
-		lines = new String[] { get(line, ":0", false), get(line, ":1", false),
-				get(line, ":2", false), get(line, ":3", false) };
+		double x = Double.parseDouble(get(line, "x=", false)), y = Double.parseDouble(get(line, "y=", false)),
+				z = Double.parseDouble(get(line, "z=", false));
+		loc = new Location(plugin.getServer().getWorld(worldName), x, y, z);
+		lines = new String[] { get(line, ":0", false), get(line, ":1", false), get(line, ":2", false),
+				get(line, ":3", false) };
 		m = new Marquee[lines.length];
 	}
 
-	public String[] callback(final String[] l) {
+	public String[] callback(String[] l) {
 		String[] lines = Arrays.copyOf(l, l.length);
 		String[] output = new String[lines.length];
 		for (int i = 0; i < lines.length; i++) {
@@ -184,7 +174,7 @@ public final class SignData {
 	}
 
 	@Override
-	public boolean equals(final Object obj) {
+	public boolean equals(Object obj) {
 		if (obj instanceof Location)
 			return loc.equals(obj);
 		else if (obj instanceof SignData)
@@ -222,8 +212,6 @@ public final class SignData {
 	 * Update the Marquees
 	 */
 	public void update() {
-		for (final Marquee a : m)
-			if (a != null)
-				a.update();
+		Arrays.asList(m).stream().filter(a -> a != null).forEach(a -> a.update());
 	}
 }

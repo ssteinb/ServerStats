@@ -49,8 +49,7 @@ public class JSONML {
 	 * @return A JSONArray if the value is the outermost tag, otherwise null.
 	 * @throws JSONException
 	 */
-	private static Object parse(final XMLTokener x, final boolean arrayForm,
-			final JSONArray ja) throws JSONException {
+	private static Object parse(final XMLTokener x, final boolean arrayForm, final JSONArray ja) throws JSONException {
 		String attribute;
 		char c;
 		String closeTag = null;
@@ -80,9 +79,7 @@ public class JSONML {
 
 						token = x.nextToken();
 						if (!(token instanceof String)) {
-							throw new JSONException(
-									"Expected a closing name instead of '"
-											+ token + "'.");
+							throw new JSONException("Expected a closing name instead of '" + token + "'.");
 						}
 						if (x.nextToken() != XML.GT) {
 							throw x.syntaxError("Misshaped close tag");
@@ -165,9 +162,7 @@ public class JSONML {
 						// attribute = value
 
 						attribute = (String) token;
-						if (!arrayForm
-								&& ("tagName".equals(attribute) || "childNode"
-										.equals(attribute))) {
+						if (!arrayForm && ("tagName".equals(attribute) || "childNode".equals(attribute))) {
 							throw x.syntaxError("Reserved attribute.");
 						}
 						token = x.nextToken();
@@ -176,8 +171,7 @@ public class JSONML {
 							if (!(token instanceof String)) {
 								throw x.syntaxError("Missing value");
 							}
-							newjo.accumulate(attribute,
-									XML.stringToValue((String) token));
+							newjo.accumulate(attribute, XML.stringToValue((String) token));
 							token = null;
 						} else {
 							newjo.accumulate(attribute, "");
@@ -210,8 +204,7 @@ public class JSONML {
 						closeTag = (String) parse(x, arrayForm, newja);
 						if (closeTag != null) {
 							if (!closeTag.equals(tagName)) {
-								throw x.syntaxError("Mismatched '" + tagName
-										+ "' and '" + closeTag + "'");
+								throw x.syntaxError("Mismatched '" + tagName + "' and '" + closeTag + "'");
 							}
 							tagName = null;
 							if (!arrayForm && newja.length() > 0) {
@@ -229,8 +222,7 @@ public class JSONML {
 				}
 			} else {
 				if (ja != null) {
-					ja.put(token instanceof String ? XML
-							.stringToValue((String) token) : token);
+					ja.put(token instanceof String ? XML.stringToValue((String) token) : token);
 				}
 			}
 		}
@@ -250,8 +242,7 @@ public class JSONML {
 	 * @return A JSONArray containing the structured data from the XML string.
 	 * @throws JSONException
 	 */
-	public static JSONArray toJSONArray(final String string)
-			throws JSONException {
+	public static JSONArray toJSONArray(final String string) throws JSONException {
 		return toJSONArray(new XMLTokener(string));
 	}
 
@@ -269,8 +260,7 @@ public class JSONML {
 	 * @return A JSONArray containing the structured data from the XML string.
 	 * @throws JSONException
 	 */
-	public static JSONArray toJSONArray(final XMLTokener x)
-			throws JSONException {
+	public static JSONArray toJSONArray(final XMLTokener x) throws JSONException {
 		return (JSONArray) parse(x, true, null);
 	}
 
@@ -289,8 +279,7 @@ public class JSONML {
 	 * @return A JSONObject containing the structured data from the XML string.
 	 * @throws JSONException
 	 */
-	public static JSONObject toJSONObject(final String string)
-			throws JSONException {
+	public static JSONObject toJSONObject(final String string) throws JSONException {
 		return toJSONObject(new XMLTokener(string));
 	}
 
@@ -309,8 +298,7 @@ public class JSONML {
 	 * @return A JSONObject containing the structured data from the XML string.
 	 * @throws JSONException
 	 */
-	public static JSONObject toJSONObject(final XMLTokener x)
-			throws JSONException {
+	public static JSONObject toJSONObject(final XMLTokener x) throws JSONException {
 		return (JSONObject) parse(x, false, null);
 	}
 

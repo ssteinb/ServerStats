@@ -15,27 +15,24 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package net.foxgenesis.helper;
+package net.foxgenesis.serverstats;
 
-import java.util.Arrays;
+public final class ErrorHandler {
 
-public final class ArrayHelper {
-
-	public static <T> T[] append(T[] array, T element) {
-		T[] d = Arrays.copyOf(array, array.length + 1);
-		d[d.length - 1] = element;
-		return d;
+	public static final void error(ErrorType error) {
+		Logger.error(errorText(error));
 	}
 
-	public static String merge(String[] array) {
-		return Arrays.asList(array).stream().reduce((a, b) -> a + b).get();
+	public static final void fatalError(ErrorType error) {
+		error(error);
+		ServerStats.instance.getPluginLoader().disablePlugin(ServerStats.instance);
 	}
 
-	public static char[] rest(char[] array) {
-		return array.length > 1 ? Arrays.copyOfRange(array, 1, array.length) : null;
+	public static final String errorText(ErrorType error) {
+		return ExternalStrings.get("error") + error.name();
 	}
 
-	public static <T> T[] rest(T[] array) {
-		return array.length > 1 ? Arrays.copyOfRange(array, 1, array.length) : null;
+	public enum ErrorType {
+		FORMAT, INVALID_URL, INVALID_LANG, CUSTOM_COMMAND;
 	}
 }

@@ -17,23 +17,22 @@
  */
 package net.foxgenesis.serverstats.websites;
 
-import static net.foxgenesis.serverstats.Logger.log;
-
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashMap;
-
-import net.foxgenesis.helper.StringHelper;
-import net.foxgenesis.serverstats.ErrorCodes;
-import net.foxgenesis.serverstats.ExternalStrings;
-import net.foxgenesis.serverstats.Settings;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.json.JSONObject;
 
-public abstract class WebsiteStats {
+import net.foxgenesis.helper.StringHelper;
+import net.foxgenesis.serverstats.ErrorHandler;
+import net.foxgenesis.serverstats.ExternalStrings;
+import net.foxgenesis.serverstats.Settings;
+
+public abstract class WebsiteStats{
 	private URL url;
 	private long lastUpdate = -1;
 	private long updateTime = 60000;
@@ -45,12 +44,10 @@ public abstract class WebsiteStats {
 	private final String name;
 	private final char tag;
 
-	public WebsiteStats(final String shorthandName, final char tag) {
+	public WebsiteStats(String shorthandName, char tag) {
 		name = shorthandName;
 		this.tag = tag;
-		final String[][] j = registerTags();
-		log(ExternalStrings.get("web-stats-create-tags").replace("%name%",
-				shorthandName));
+		String[][] j = registerTags();
 		if (j.length > 0)
 			for (int i = 0; i < j[0].length; i++)
 				tags.put(j[0][i], j[1][i]);
@@ -62,19 +59,17 @@ public abstract class WebsiteStats {
 	 * @param sender
 	 *            - Player to use
 	 */
-	public final void display(final CommandSender sender) {
+	public final void display(CommandSender sender) {
 		if (enabled)
-			for (final String a : format(display))
+			Arrays.asList(format(display)).forEach(a -> {
 				try {
 					sender.sendMessage(format(a));
-				} catch (final Exception e) {
-					sender.sendMessage(ChatColor.RED
-							+ ErrorCodes.errorText(ErrorCodes.FORMAT));
+				} catch (Exception e) {
+					sender.sendMessage(ChatColor.RED + ErrorHandler.errorText(ErrorHandler.ErrorType.FORMAT));
 				}
+			});
 		else
-			sender.sendMessage(ChatColor.RED
-					+ ExternalStrings.get("server-stats-enabled").replace(
-							"%name%", name));
+			sender.sendMessage(ChatColor.RED + ExternalStrings.get("server-stats-enabled").replace("%name%", name));
 	}
 
 	/**
@@ -92,14 +87,12 @@ public abstract class WebsiteStats {
 	 *            - String to use
 	 * @return formated String
 	 */
-	public final String format(final String line) {
+	public final String format(String line) {
 		if (!line.contains(tag + ""))
 			return line;
-		final int firstIndex = line.indexOf("" + tag) + 1, last = line.indexOf(
-				"" + tag, firstIndex + 1);
-		return format(removeAndInsert(line, firstIndex, last,
-				getStat(line.substring(firstIndex, last))).replaceFirst(
-				tag + "", "").replaceFirst(tag + "", ""));
+		int firstIndex = line.indexOf("" + tag) + 1, last = line.indexOf("" + tag, firstIndex + 1);
+		return format(removeAndInsert(line, firstIndex, last, getStat(line.substring(firstIndex, last)))
+				.replaceFirst(tag + "", "").replaceFirst(tag + "", ""));
 	}
 
 	/**
@@ -109,20 +102,20 @@ public abstract class WebsiteStats {
 	 *            - Strings to use
 	 * @return formated Strings
 	 */
-	public final String[] format(final String[] lines) {
+	public final String[] format(String[] lines) {
 		for (int i = 0; i < lines.length; i++)
 			lines[i] = format(lines[i]);
 		return lines;
 	}
 
-	private String get(final String key) {
-		final JSONObject j = getJSON();
+	private String get(String key) {
+		JSONObject j = getJSON();
 		if (j != null)
 			return j.getString(key);
 		return "NULL";
 	}
 
-	private JSONObject getJSON() {
+	protected JSONObject getJSON() {
 		if (getNewStats()) {
 			json = update(url);
 			lastUpdate = System.currentTimeMillis();
@@ -139,12 +132,11 @@ public abstract class WebsiteStats {
 		return name;
 	}
 
-	private final boolean getNewStats() {
-		return lastUpdate == -1
-				|| (System.currentTimeMillis() - lastUpdate) >= updateTime;
+	private boolean getNewStats() {
+		return lastUpdate == -1 || (System.currentTimeMillis() - lastUpdate) >= updateTime;
 	}
 
-	private final String getStat(String tag) {
+	private String getStat(String tag) {
 		tag = tag.toLowerCase();
 		if (tags.containsKey(tag))
 			return get(tags.get(tag));
@@ -167,43 +159,60 @@ public abstract class WebsiteStats {
 	 * @param config
 	 *            - config to load from
 	 */
-	public void loadSettings(final FileConfiguration config) {
+	public void loadSettings(FileConfiguration config) {
 		enabled = config.getBoolean(Settings.Website.enabled(name));
 		if (!enabled)
 			return;
-		updateTime = config.getLong(Settings.Cache.EXPIRATION_TIME);
+		updateTime = config.getLong(Settings.Cache.EXPIRATION_TIME) * 60000;
 		display = config.getString(Settings.Website.display(name)).split(";");
 		format = new boolean[display.length];
 		for (int i = 0; i < display.length; i++)
 			format[i] = (StringHelper.countChar(display[i], tag) % 2) == 0;
 		try {
 			url = new URL(config.getString(Settings.Website.url(name)));
-		} catch (final MalformedURLException e) {
-			ErrorCodes.error(ErrorCodes.INVALID_URL);
+		} catch (MalformedURLException e) {
+			ErrorHandler.error(ErrorHandler.ErrorType.INVALID_URL);
 		}
 	}
 
+	/**
+	 * Preset the keys used for the JSON object<br>
+	 * <b>This is only used if the data has constant keys.</b> Otherwise use {@link #useNewKeys()}<br>
+	 * <b><u>Keys</u></b> - The keys of the JSON.<br>
+	 * <b><u>Output keys</u></b> - Keys that will retrieve the data (the ones located in the config file).
+	 * <br><br>(i.e.) <pre>{@code new String[][]{array of keys,array of output keys};</pre>
+	 * @return Array of keys and output keys
+	 */
 	protected abstract String[][] registerTags();
 
-	private final String removeAndInsert(final String line, final int start,
-			final int end, final String value) {
-		final String front = line.substring(0, start);
-		final String back = line.substring(end, line.length());
+	private String removeAndInsert(String line, int start, int end, String value) {
+		String front = line.substring(0, start);
+		String back = line.substring(end, line.length());
 		return front + value + back;
 	}
 
 	/**
-	 * Get the new statistics and return them as a JSONObject
-	 *
-	 * @param url
-	 *            - url to get stats from
-	 * @return JSONObject representation of the stats
+	 * Get the new statistics and return them as a {@link JSONObject}
+	 * @param url - {@link URL} to get stats from
+	 * @return {@link JSONObject} representation of the stats
 	 */
 	protected abstract JSONObject update(URL url);
 
-	protected final void useNewTags(final String[][] tags) {
+	/**
+	 * Update the keys used. See {@link #registerTags()} for details
+	 * @param tags - Array of keys and output keys
+	 */
+	protected final void useNewKeys(String[][] tags) {
 		this.tags.clear();
 		for (int i = 0; i < tags[0].length; i++)
 			this.tags.put(tags[0][i], tags[1][i]);
+	}
+	
+	/**
+	 * Update keys used by {@link JSONObject}. See {@link #registerTags()} for details
+	 * @param j - {@link JSONObject} to get keys from
+	 */
+	protected final void useNewKeys(JSONObject j) {
+		useNewKeys(new String[][] { j.keySet().toArray(new String[] {}), j.keySet().toArray(new String[] {}) });
 	}
 }
