@@ -25,12 +25,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Arrays;
-
-import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.plugin.java.JavaPlugin;
-
-import com.google.common.io.ByteStreams;
 
 import net.foxgenesis.serverstats.signs.SignData;
 import net.foxgenesis.serverstats.signs.SignListener;
@@ -40,32 +34,62 @@ import net.foxgenesis.serverstats.websites.MinecraftServerListStats;
 import net.foxgenesis.serverstats.websites.PMCStats;
 import net.foxgenesis.serverstats.websites.WebsiteStats;
 
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import com.google.common.io.ByteStreams;
+
 public class ServerStats extends JavaPlugin {
 
-	protected static ServerStats instance;
-	protected WebsiteStats[] stats;
+	public static ServerStats instance;
 
-	private File loadResource(String resource) {
-		File folder = getDataFolder();
+	/**
+	 * Format an array of Strings with WebsiteStats
+	 *
+	 * @param lines
+	 *            - lines to format
+	 * @return formated Strings
+	 */
+	public static String[] format(final String[] lines) {
+		for (final WebsiteStats a : ServerStats.instance.stats)
+			a.format(lines);
+		return lines;
+	}
+
+	private WebsiteStats[] stats;
+
+	private CommandHelper helper;
+
+	private File loadResource(final String resource) {
+		final File folder = getDataFolder();
 		if (!folder.exists())
 			folder.mkdir();
 		else {
-			File f = new File(folder + resource);
+			final File f = new File(folder + resource);
 			if (f.exists())
 				return f;
 		}
-		File resourceFile = new File(folder, resource);
+		final File resourceFile = new File(folder, resource);
 		try {
 			if (!resourceFile.exists()) {
 				resourceFile.createNewFile();
-				try (InputStream in = getResource(resource); OutputStream out = new FileOutputStream(resourceFile)) {
+				try (InputStream in = getResource(resource);
+						OutputStream out = new FileOutputStream(resourceFile)) {
 					ByteStreams.copy(in, out);
 				}
 			}
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 		return resourceFile;
+	}
+
+	@Override
+	public boolean onCommand(final CommandSender sender, final Command cmd,
+			final String label, final String[] args) {
+		return helper.onCommand(sender, cmd, label, args);
 	}
 
 	@Override
@@ -84,22 +108,6 @@ public class ServerStats extends JavaPlugin {
 		// init
 		Logger.init(getLogger());
 		instance = this;
-		stats = new WebsiteStats[] { new CustomJSON(), new PMCStats(), new MinecraftServerListStats() };
-		
-		/*log("Loading custom stats...");
-		Arrays.asList(getDataFolder().listFiles((file,name) -> name.endsWith(".jar"))).forEach(file -> {
-			try {
-				String name = file.getName().substring(0, file.getName().lastIndexOf("."));
-				byte[] classBytes = FileUtil.readBytes(file.getPath());
-			    Class<?> c = ClassLoaderUtil.defineClass(name, classBytes);
-			    Object o = c.newInstance();                    // start using it...
-				if(o instanceof WebsiteStats) {
-					ArrayHelper.append(stats, (WebsiteStats)o);
-				} else error(file.getName() + " has not been created correctly");
-			} catch(Exception e){
-				e.printStackTrace();
-			}
-		});*/
 
 		// load external strings
 		if (!ExternalStrings.init(getConfig().getString("lang"))) {
@@ -120,25 +128,33 @@ public class ServerStats extends JavaPlugin {
 		}
 
 		// Create stat classes
-		Arrays.asList(stats).forEach(a -> {
+		stats = new WebsiteStats[] { new PMCStats(),
+				new MinecraftServerListStats(), new CustomJSON() };
+		for (final WebsiteStats a : stats) {
+			log(ExternalStrings.get("web-stat-create").replace("%name%",
+					a.getName()));
 			a.loadSettings(getConfig());
-		});
+		}
 
-		new ServerStatsCommand(stats);
 		// create command listener
+		helper = new CommandHelper(stats);
 
 		// Create sign data
 		log(ExternalStrings.get("sign-data-load"));
-		SignData.init(this,getConfig().getBoolean(Settings.Signs.ALLOW_MARQUEE));
+		SignData.file = new File(getDataFolder().toString() + "/.signdata");
+		SignData.init(getConfig().getBoolean(Settings.Signs.ALLOW_MARQUEE));
 
 		// create sign listener
 		log(ExternalStrings.get("sign-listener-create"));
-		getServer().getPluginManager().registerEvents(new SignListener(), this);
+		getServer().getPluginManager().registerEvents(new SignListener(helper),
+				this);
 
 		// Create sign update timer
-		getServer().getScheduler().runTaskTimer(this,
-				new SignUpdater(getConfig().getBoolean(Settings.Signs.LOG_UPDATE_TIME)),
-				getConfig().getLong(Settings.Signs.UPDATE_TIME), getConfig().getLong(Settings.Signs.UPDATE_TIME));
-		log(ExternalStrings.get("loaded"));
+		getServer().getScheduler().runTaskTimer(
+				this,
+				new SignUpdater(getConfig().getBoolean(
+						Settings.Signs.LOG_UPDATE_TIME)),
+				getConfig().getLong(Settings.Signs.UPDATE_TIME),
+				getConfig().getLong(Settings.Signs.UPDATE_TIME));
 	}
 }

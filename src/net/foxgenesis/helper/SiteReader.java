@@ -24,8 +24,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 
-import org.json.JSONObject;
-
 public final class SiteReader {
 
 	/**
@@ -36,24 +34,14 @@ public final class SiteReader {
 	 * @return site's HTML
 	 * @throws IOException
 	 */
-	public static String getHTML(URL url) throws IOException {
-		BufferedReader in = getStream(url);
+	public static String getHTML(final URL url) throws IOException {
+		final BufferedReader in = getStream(url);
 		String output = "";
 		String inputLine;
 		while ((inputLine = in.readLine()) != null)
 			output += inputLine;
 		in.close();
 		return output;
-	}
-	
-	/**
-	 * Read a page containing JSON.
-	 * @param url - {@link URL} to use
-	 * @return A {@link JSONObject} of the page
-	 * @throws IOException Normal IO issues
-	 */
-	public static JSONObject readJSON(URL url) throws IOException {
-		return new JSONObject(SiteReader.getHTML(url));
 	}
 
 	/**
@@ -64,9 +52,9 @@ public final class SiteReader {
 	 * @return site's HTML by line
 	 * @throws IOException
 	 */
-	public static String[] getHTMLLines(URL url) throws IOException {
-		BufferedReader in = getStream(url);
-		ArrayList<String> output = new ArrayList<String>();
+	public static String[] getHTMLLines(final URL url) throws IOException {
+		final BufferedReader in = getStream(url);
+		final ArrayList<String> output = new ArrayList<String>();
 		String inputLine;
 		while ((inputLine = in.readLine()) != null)
 			output.add(inputLine);
@@ -74,10 +62,11 @@ public final class SiteReader {
 		return output.toArray(new String[] {});
 	}
 
-	private static BufferedReader getStream(URL url) throws IOException {
-		URLConnection connection = url.openConnection();
+	private static BufferedReader getStream(final URL url) throws IOException {
+		final URLConnection connection = url.openConnection();
 		connection.setRequestProperty("User-Agent", "X-ServerStats");
 		connection.setReadTimeout(5000);
-		return new BufferedReader(new InputStreamReader(connection.getInputStream()));
+		return new BufferedReader(new InputStreamReader(
+				connection.getInputStream()));
 	}
 }

@@ -87,7 +87,8 @@ public class HTTP {
 	 *         string.
 	 * @throws JSONException
 	 */
-	public static JSONObject toJSONObject(final String string) throws JSONException {
+	public static JSONObject toJSONObject(final String string)
+			throws JSONException {
 		final JSONObject jo = new JSONObject();
 		final HTTPTokener x = new HTTPTokener(string);
 		String token;
@@ -176,8 +177,10 @@ public class HTTP {
 		sb.append(CRLF);
 		while (keys.hasNext()) {
 			string = keys.next();
-			if (!"HTTP-Version".equals(string) && !"Status-Code".equals(string) && !"Reason-Phrase".equals(string)
-					&& !"Method".equals(string) && !"Request-URI".equals(string) && !jo.isNull(string)) {
+			if (!"HTTP-Version".equals(string) && !"Status-Code".equals(string)
+					&& !"Reason-Phrase".equals(string)
+					&& !"Method".equals(string)
+					&& !"Request-URI".equals(string) && !jo.isNull(string)) {
 				sb.append(string);
 				sb.append(": ");
 				sb.append(jo.getString(string));

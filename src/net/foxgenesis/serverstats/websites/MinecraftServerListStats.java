@@ -44,10 +44,12 @@ public class MinecraftServerListStats extends WebsiteStats {
 			for (final String a : SiteReader.getHTMLLines(url)) {
 				if (foundTable)
 					if (a.contains("/table"))
-						return ArrayHelper.rest(ArrayHelper.merge(data).replaceAll("<tr>", "").split("</tr>"));
+						return ArrayHelper.rest(ArrayHelper.merge(data)
+								.replaceAll("<tr>", "").split("</tr>"));
 					else
 						data = ArrayHelper.append(data, a);
-				if (!foundTable && a.startsWith("<table ") && a.contains("serverdata"))
+				if (!foundTable && a.startsWith("<table ")
+						&& a.contains("serverdata"))
 					foundTable = true;
 			}
 		} catch (final IOException e) {

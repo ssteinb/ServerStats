@@ -1,4 +1,8 @@
 name: ServerStats
 main: net.foxgenesis.serverstats.ServerStats
-version: 2.0
+version: 1.0
 author: fox_news
+
+commands:
+  serverstats:
+    usage: /serverstats

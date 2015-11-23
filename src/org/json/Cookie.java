@@ -81,7 +81,8 @@ public class Cookie {
 	 *         members.
 	 * @throws JSONException
 	 */
-	public static JSONObject toJSONObject(final String string) throws JSONException {
+	public static JSONObject toJSONObject(final String string)
+			throws JSONException {
 		String name;
 		final JSONObject jo = new JSONObject();
 		Object value;
@@ -147,8 +148,9 @@ public class Cookie {
 	 * convert plus to space.
 	 *
 	 * @param string
-	 *            A string that may contain <code>+</code> &nbsp;
-	 *            <small>(plus)</small> and <code>%</code><i>hh</i> sequences.
+	 *            A string that may contain <code>+</code>
+	 *            &nbsp;<small>(plus)</small> and <code>%</code><i>hh</i>
+	 *            sequences.
 	 * @return The unescaped string.
 	 */
 	public static String unescape(final String string) {

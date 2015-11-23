@@ -1,53 +1,40 @@
-#Use ; for a new line in the display field
-#Valid tags for PMC include: title, author, views, views_today, diamonds, favorites, server_votes, comments, server_score, stats_updated, url and author_url
-#Valid tags for MCSL include: title, votes, votes_month
-#Valid tags for json are created based off it's keys
-#Tags for PMC use %
-#Tags for MCSL use @
-#Tags for json use ~
-
-#Langauge file
 lang: en_US
-
 settings:
   pmc:
     #Enter in a valid PMC server post (i.e. http://www.planetminecraft.com/server/-hunger-games-free-to-play-no-whitelist-heaps-of-players)
     url: 
-    
     #Choose what to display when stats are requested. Tags (i.e. %title%) will be replaced before output. 
+    #Tags for PMC use %
+    #Valid tags include: title, author, views, views_today, diamonds, favorites, server_votes, comments, server_score, stats_updated, url and author_url
+    #Use ; for a new line
     display: We have %views_today% today!;This a new line!
-    
     enable: false
-    
   mcsl:
     #Enter in a valid MCSL server post (i.e. http://minecraft-server-list.com/server/202533/)
     url: 
-    
     #Choose what to display when stats are requested. Tags (i.e. $title$) will be replaced before output. 
+    #Tags for MCSL use @
+    #Valid tags include: title, votes, votes_month
+    #Use ; for a new line
     display: We have $votes_month$ this month!;This a new line!
-    
     enable: false
-    
-  #json support
-  json:
+  #CUSTOM IS FOR ADVANCED USERS!
+  custom:
     #Enter in a valid JSON containing url
     url: 
-    
-    #Choose what to display when stats are requested. Tags (i.e. ~title~) will be replaced before output. 
-    display: We have !views_today~ today!;This a new line!
-    
+    #Choose what to display when stats are requested. Tags (i.e. ^title^) will be replaced before output. 
+    #Tags for PMC use ^
+    #Valid tags are created based off the keys in the JSON
+    #Use ; for a new line
+    display: We have ^views_today^ today!;This a new line!
     enable: false
-    
   cache:
-    #Set time (in minutes) of when stat cache should expire
-    expiration-time: 1
-    
+    #Set time (in milliseconds) of when cache should expire
+    expiration-time: 60000
   signs:
     #Set if marquees should be allowed
     allow-marquee: true
-    
-    #Amount of tick before signs are to update
+    #amount of ticks before signs are to update
     update-time: 60
-    
     #Print time taken to update signs in console
     log-update-time: false
