@@ -49,8 +49,7 @@ public class CookieList {
 	 * @return A JSONObject
 	 * @throws JSONException
 	 */
-	public static JSONObject toJSONObject(final String string)
-			throws JSONException {
+	public static JSONObject toJSONObject(final String string) throws JSONException {
 		final JSONObject jo = new JSONObject();
 		final JSONTokener x = new JSONTokener(string);
 		while (x.more()) {

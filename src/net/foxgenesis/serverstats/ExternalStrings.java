@@ -18,7 +18,7 @@
 package net.foxgenesis.serverstats;
 
 import static net.foxgenesis.serverstats.Logger.error;
-
+import static net.foxgenesis.serverstats.Logger.log;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -41,6 +41,7 @@ public final class ExternalStrings {
 		Scanner scanner = null;
 		try {
 			InputStream is = ServerStats.instance.getResource(lang + ".lang");
+			log("Loading " + lang + ".lang");
 			scanner = new Scanner(is, "UTF-8");
 			String line = "";
 			while (scanner.hasNextLine())
@@ -54,6 +55,7 @@ public final class ExternalStrings {
 					}
 					strings.put(d[0].trim(), d[1].trim());
 				}
+			log(strings.get("language-loaded"));
 			return hasLang = true;
 		} catch (NullPointerException e) {
 			error(lang + ".lang is not supported or was not found!");

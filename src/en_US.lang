@@ -4,18 +4,19 @@ removing-task: Removing task...
 removing-access-data: Removing access data...
 
 #onEnable
+language-loaded: English (US) language loaded
 load-config: Loading config...
 web-stat-create: Creating stats for %name%...
 sign-data-load: Loading sign data...
 sign-listener-create: Creating sign listener...
-web-stats-create-tags: Creating tags for %name%...
+loaded: ServerStats loaded
 
 #Errors
 error: An error has occurred. Please contact your administrator. Ref=
 invalid-tag: Unsupported Tag
+console-rest: Console can not use this command
 
 #Commands
-command-header: ------[ ServerStats Help ]------
 server-stats-listen: listen
 server-stats-listen-add: Adding sign for %loc%
 server-stats-listen-noadd: Sign already added!
@@ -23,7 +24,6 @@ server-stats-listen-toggle: Listen=
 server-stats-update: update
 server-stats-forceupdate-notify: Updating...
 server-stats-forceupdate-complete: Updated!
-server-stats-enabled: %name% is not enabled
 
 #Signs
 signs-remove: removing 

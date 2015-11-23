@@ -37,7 +37,7 @@ public class Marquee {
 	 * @param n
 	 *            - capacity of the Marquee
 	 */
-	public Marquee(final String s, final int n) {
+	public Marquee(String s, int n) {
 		if (s == null || n < 1)
 			throw new IllegalArgumentException("Null string or n < 1");
 		b = new StringBuilder(n);
@@ -47,7 +47,7 @@ public class Marquee {
 		this.n = n;
 	}
 
-	public void setString(final String s) {
+	public void setString(String s) {
 		this.s = b + s + b;
 	}
 
